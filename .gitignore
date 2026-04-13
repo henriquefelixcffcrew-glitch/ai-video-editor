@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+*.log
+server/uploads/
+server/data/
+client/dist/
+.vite/
