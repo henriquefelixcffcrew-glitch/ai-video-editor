@@ -3,6 +3,18 @@ import path from 'path';
 import fs from 'fs';
 import type { VideoMetadata, Timeline, MediaFile, ExportSettings } from '../types/index.js';
 
+function parseFps(fpsString?: string): number {
+  if (!fpsString) return 30;
+  const parts = fpsString.split('/');
+  if (parts.length === 2) {
+    const num = parseInt(parts[0], 10);
+    const den = parseInt(parts[1], 10);
+    return den > 0 ? Math.round(num / den) : 30;
+  }
+  const parsed = parseFloat(fpsString);
+  return isNaN(parsed) ? 30 : Math.round(parsed);
+}
+
 export function probeVideo(filePath: string): Promise<VideoMetadata> {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, data) => {
@@ -15,7 +27,7 @@ export function probeVideo(filePath: string): Promise<VideoMetadata> {
         duration: data.format.duration ?? 0,
         width: videoStream?.width ?? 0,
         height: videoStream?.height ?? 0,
-        fps: videoStream?.r_frame_rate ? eval(videoStream.r_frame_rate) : 30,
+        fps: parseFps(videoStream?.r_frame_rate),
         codec: videoStream?.codec_name ?? 'unknown',
         audioCodec: audioStream?.codec_name,
       });

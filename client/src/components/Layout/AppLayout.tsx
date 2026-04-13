@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { MediaLibrary } from '../MediaLibrary/MediaLibrary';
 import { PreviewPlayer } from '../Preview/PreviewPlayer';
 import { Timeline } from '../Timeline/Timeline';
 import { PromptPanel } from '../PromptPanel/PromptPanel';
+import { ExportDialog } from '../Export/ExportDialog';
 import { useProjectStore } from '../../stores/projectStore';
 import { useTimelineStore } from '../../stores/timelineStore';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Download } from 'lucide-react';
 
 interface Props {
   onBack: () => void;
@@ -14,6 +15,7 @@ interface Props {
 export function AppLayout({ onBack }: Props) {
   const { currentProject, saveProject, loadMedia } = useProjectStore();
   const { timeline, setTimeline } = useTimelineStore();
+  const [showExport, setShowExport] = useState(false);
 
   useEffect(() => {
     loadMedia();
@@ -51,6 +53,13 @@ export function AppLayout({ onBack }: Props) {
           <Save className="w-3.5 h-3.5" />
           Save
         </button>
+        <button
+          onClick={() => setShowExport(true)}
+          className="flex items-center gap-1.5 px-3 py-1 bg-editor-accent hover:bg-editor-accent-hover rounded text-xs text-white font-medium transition-colors"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Export
+        </button>
       </div>
 
       {/* Main content */}
@@ -75,6 +84,8 @@ export function AppLayout({ onBack }: Props) {
       <div className="h-64 border-t border-editor-border shrink-0">
         <Timeline />
       </div>
+
+      <ExportDialog isOpen={showExport} onClose={() => setShowExport(false)} />
     </div>
   );
 }
